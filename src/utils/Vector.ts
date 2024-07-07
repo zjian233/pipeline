@@ -5,6 +5,12 @@ export interface IVector {
     x: number;
     y: number;
     z: number;
+
+    add(v: IVector): IVector;
+    norm(): IVector;
+    clone(): IVector;
+    sub(v: IVector): IVector;
+    multipleScale(scale: number):IVector;
 }
 export class Vector implements IVector {
     x: number;
@@ -21,6 +27,14 @@ export class Vector implements IVector {
         this.z = z;
     }
 
+
+    add(v: IVector):IVector {
+        this.x += v.x;
+        this.y += v.y;
+        this.z += v.z;
+        return this;
+    }
+
     sub(v: Vector) {
         this.x = this.x - v.x;
         this.y = this.y - v.y;
@@ -28,9 +42,9 @@ export class Vector implements IVector {
         return this;
     }
 
-    norm() {
+    norm(): IVector {
         const norm = Math.sqrt(
-            this.x*this.x + this.y* this.y + this.z* this.z
+            this.x * this.x + this.y * this.y + this.z * this.z
         );
 
         if (norm === 0) {
@@ -51,10 +65,10 @@ export class Vector implements IVector {
     applyMatrix4(mat: Matrix4) {
         const res = [];
         const vect = [this.x, this.y, this.z, 1];
-        for (let i=0; i<4;i++) {
+        for (let i = 0; i < 4; i++) {
             let sum = 0;
-            for (let j=0; j<4; j++) {
-                sum += mat.getIndex(i+1, j+1) * vect[j];
+            for (let j = 0; j < 4; j++) {
+                sum += mat.getIndex(i + 1, j + 1) * vect[j];
             }
             res.push(sum);
         }
@@ -62,6 +76,17 @@ export class Vector implements IVector {
         this.y = res[1] / res[3];
         this.z = res[2] / res[3];
         return this;
+    }
+    
+    multipleScale(scale: number): IVector {
+        this.x *= scale;
+        this.y *= scale;
+        this.z *= scale;
+        return this;
+    }
+
+    length():number {
+        return Math.sqrt(this.x*this.x + this.y*this.y + this.z*this.z);
     }
 
 }

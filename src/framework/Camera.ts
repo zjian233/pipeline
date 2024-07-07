@@ -33,6 +33,10 @@ export class PerspectiveCamera {
         this.position = point;
     }
 
+    getPosition() {
+        return this.position;
+    }
+
     getProjectionMatrix():Matrix4 {
         const matrix = new Matrix4();
         const aspect = this.aspect;

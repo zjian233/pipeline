@@ -24,6 +24,7 @@ export class Point implements IPoint {
         this.y = y;
         this.z = z;
     }
+
 }
 
 
