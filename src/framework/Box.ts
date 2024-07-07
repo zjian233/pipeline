@@ -15,6 +15,8 @@ export class Box implements IObject3D {
 
     declare vertexNormals: IVector[];
 
+    declare vertexUvs: number[];
+
     constructor(width: number = 1, height: number = 1, deep: number = 1) {
         // super();
         const w = width, h = height, d = deep;
@@ -24,19 +26,39 @@ export class Box implements IObject3D {
             new Point(w/2, h/2, d/2),new Point(-w/2, h/2, d/2)
         ];
         this.renderList = [
+            // 底面
             0, 1, 2,
             0, 2, 3,
+            //后面
             0, 4, 5,
             0, 5, 1,
+            //左边
             0, 3, 7,
             0, 7, 4,
+            // 右边
             1, 6, 2,
             1, 5, 6,
+            // 前面
             3, 6, 7,
             2, 6, 3,
+            // 顶面
             5, 4, 6,
             4, 7, 6 
+        ]
 
+        this.vertexUvs = [
+            // 底面
+            0, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0,
+            // 后面
+            0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0,
+            // 左边
+            0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1,
+            // 右边
+            1, 0, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1,
+            // 前面
+            0, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 0,
+            // 顶面
+            1, 1, 0, 1, 1, 0, 0, 1, 0, 0, 1, 0
         ]
 
         this.setMaterial(new Material(Color.Red()));

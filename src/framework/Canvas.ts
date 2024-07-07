@@ -88,21 +88,29 @@ export class Canvas {
             const v2Normal = object.vertexNormals[object.renderList[i + 1]];
             const v3Normal = object.vertexNormals[object.renderList[i + 2]];
 
+            const uvIdx = i * 2
+            const v1Uv = object.vertexUvs.slice(uvIdx, uvIdx+2);
+            const v2Uv = object.vertexUvs.slice(uvIdx+2, uvIdx+4);
+            const v3Uv = object.vertexUvs.slice(uvIdx+4, uvIdx+6);
+
             const params = [
                 {
                     vertex: vertices[i],
                     vertexNormal: v1Normal,
                     screenPos: screenPosArr[0],
+                    uv: v1Uv,
                 },
                 {
                     vertex: vertices[i+1],
                     vertexNormal: v2Normal,
                     screenPos: screenPosArr[1],
+                    uv: v2Uv,
                 },
                 {
                     vertex: vertices[i+2],
                     vertexNormal: v3Normal,
                     screenPos: screenPosArr[2],
+                    uv: v3Uv
                 }
             ]
             // console.log('params:', params);
@@ -146,13 +154,14 @@ export class Canvas {
         verticesParams: {
             vertex:IPoint,
             vertexNormal: IVector,
-            screenPos:IPoint
+            screenPos:IPoint,
+            uv: number[]
         }[],
         material: IMaterial
     ) {
         const [v1, v2, v3] = verticesParams;
         // const [v1, v2, v3] = screenPos;
-        const color = material.color;
+        // const color = material.color;
 
         //const [v1Normal, v2Normal, v3Normal] = normals;
 
@@ -166,6 +175,11 @@ export class Canvas {
                     const [w1, w2, w3] = this.getBarycentric([j + 0.5, i + 0.5], v1.screenPos, v2.screenPos, v3.screenPos);
                     // 根据重心坐标算出当前的z值
                     const z = w1 * v1.screenPos.z + w2 * v2.screenPos.z + w3 * v3.screenPos.z;
+
+                    const u = w1 * v1.uv[0] + w2 * v2.uv[0] + w3 * v3.uv[0];
+                    const v = w1 * v1.uv[1] + w2 * v2.uv[1] + w3 * v3.uv[1];
+
+                    const baseColor = material.getColorFromUv(u, v);
 
                     const normal = v1.vertexNormal.clone()
                         .multipleScale(w1)
@@ -207,9 +221,9 @@ export class Canvas {
                         ISpecular = specularK * (intensity/(r*r)) * Math.pow(Math.max(0, dot(normal, halfVect)), 64);
                     }
 
-                    const difuseColor = material.color.clone().multiple(clamp(IDifuse, 0, 1));
+                    const difuseColor = baseColor.clone().multiple(clamp(IDifuse, 0, 1));
                     const specularColor = new Color(255, 255, 255).multiple(clamp(ISpecular, 0, 1));
-                    const ambientColor = material.color.clone().multiple(0.4);
+                    const ambientColor = baseColor.clone().multiple(0.4);
                     const finalColor = difuseColor.add(ambientColor).add(specularColor);
 
                     const idx = i * this.canvas.width + j;

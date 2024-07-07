@@ -6,11 +6,49 @@ import { Material } from "./framework/Material";
 import { Point } from "./utils/Point";
 import { Vector } from "./utils/Vector";
 
-function main() {
-    test();
+async function loadTexture() {
+    // const res = await fetch('/cubetexture.png');
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const image = new Image();
+    image.src = '/cubetexture.png';
+    const imageData:ImageData = await new Promise((resolve) => {
+        image.onload = () => {
+            canvas.width = image.width;
+            canvas.height = image.height;
+
+            ctx!.drawImage(image, 0, 0);
+            resolve(ctx!.getImageData(0, 0, image.width, image.height));
+            
+        }
+    });
+
+    // console.log('imageData, ', imageData);
+    // 每个像素对应的uv坐标
+    const uvMap = new Float32Array(image.width * image.height * 2);
+
+    for (let i=0; i<imageData?.height; i++) {
+        for (let j=0; j<imageData.width; j++) {
+            const u = j / (imageData.width -1);
+            const v = i / (imageData.height - 1);
+
+            const index = (i*imageData.width + j) * 2;
+            uvMap[index] = u;
+            uvMap[index+1] = v;
+        }
+    }
+    
+    return {uvMap, imageData};
+    // console.log('res:', res);
+    // return res as any;
 }
 
-function test() {
+async function main() {
+    const textureUvMap = await loadTexture();
+    test(textureUvMap);
+}
+
+function test(texture: any) {
     // 
     const app = document.getElementById('app')!;
     const canvas = new Canvas(app);
@@ -20,7 +58,7 @@ function test() {
     canvas.setScene(scene);
 
     const box = new Box(2, 2, 2);
-    box.setMaterial(new Material(new Color(0, 122, 255)));
+    box.setMaterial(new Material(new Color(0, 122, 255), texture.uvMap, texture.imageData));
     scene.add(box);
 
     // 添加光

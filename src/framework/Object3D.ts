@@ -12,6 +12,7 @@ export interface IObject3D {
     getMaterial:() => Material;
 
     computeVertexNormals:() => void;
+    vertexUvs: number[];
 }
 
 
